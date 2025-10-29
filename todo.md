@@ -29,3 +29,6 @@
 - [x] Loading states and error handling
 - [ ] Deploy to GitHub Pages
 - [ ] Create README with instructions
+
+## Bug Fixes
+- [x] Fix listening game audio playback issue

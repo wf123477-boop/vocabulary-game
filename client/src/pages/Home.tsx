@@ -24,6 +24,7 @@ export default function Home() {
   const [feedback, setFeedback] = useState("");
   const [showFeedback, setShowFeedback] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     fetch("/vocabulary-images.json")
@@ -71,9 +72,42 @@ export default function Home() {
   };
 
   const playAudio = (word: string) => {
-    const utterance = new SpeechSynthesisUtterance(word);
-    utterance.rate = 0.8;
-    window.speechSynthesis.speak(utterance);
+    try {
+      setIsPlaying(true);
+      
+      // Cancel any existing speech
+      if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+      }
+      
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.rate = 0.8;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      utterance.lang = 'en-US';
+      
+      utterance.onend = () => {
+        setIsPlaying(false);
+      };
+      
+      utterance.onerror = (event) => {
+        console.error('Speech synthesis error:', event.error);
+        setFeedback('音頻播放失敗，請重試');
+        setShowFeedback(true);
+        setIsPlaying(false);
+      };
+      
+      // Use setTimeout to ensure speech synthesis is ready
+      setTimeout(() => {
+        window.speechSynthesis.speak(utterance);
+      }, 100);
+      
+    } catch (error) {
+      console.error('Error playing audio:', error);
+      setFeedback('音頻播放失敗，請重試');
+      setShowFeedback(true);
+      setIsPlaying(false);
+    }
   };
 
   if (loading) {
@@ -236,9 +270,11 @@ export default function Home() {
                 <p className="text-gray-600">點擊下方按鈕聽取單字發音</p>
                 <Button 
                   onClick={() => playAudio(current.word)}
+                  disabled={isPlaying}
                   className="w-full h-16 text-lg"
                 >
-                  <Volume2 className="mr-2" /> 播放發音
+                  <Volume2 className="mr-2" /> 
+                  {isPlaying ? "播放中..." : "播放發音"}
                 </Button>
                 <div>
                   <label className="block text-sm font-medium mb-2">輸入你聽到的單字:</label>
