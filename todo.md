@@ -31,4 +31,4 @@
 - [ ] Create README with instructions
 
 ## Bug Fixes
-- [x] Fix listening game audio playback issue
+- [ ] Fix listening game audio playback issue - still not working, needs further investigation

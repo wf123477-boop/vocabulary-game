@@ -71,39 +71,43 @@ export default function Home() {
     }, 1500);
   };
 
-  const playAudio = (word: string) => {
+  const playAudio = async (word: string) => {
     try {
       setIsPlaying(true);
+      console.log("Starting audio playback for:", word);
       
       // Cancel any existing speech
-      if (window.speechSynthesis.speaking) {
-        window.speechSynthesis.cancel();
-      }
+      window.speechSynthesis.cancel();
       
+      // Create utterance
       const utterance = new SpeechSynthesisUtterance(word);
       utterance.rate = 0.8;
       utterance.pitch = 1;
       utterance.volume = 1;
       utterance.lang = 'en-US';
       
+      // Set up event handlers
+      utterance.onstart = () => {
+        console.log("Audio playback started");
+      };
+      
       utterance.onend = () => {
+        console.log("Audio playback ended");
         setIsPlaying(false);
       };
       
       utterance.onerror = (event) => {
         console.error('Speech synthesis error:', event.error);
-        setFeedback('音頻播放失敗，請重試');
+        setFeedback(`音頻播放失敗: ${event.error}`);
         setShowFeedback(true);
         setIsPlaying(false);
       };
       
-      // Use setTimeout to ensure speech synthesis is ready
-      setTimeout(() => {
-        window.speechSynthesis.speak(utterance);
-      }, 100);
+      // Speak
+      window.speechSynthesis.speak(utterance);
       
     } catch (error) {
-      console.error('Error playing audio:', error);
+      console.error('Error in playAudio:', error);
       setFeedback('音頻播放失敗，請重試');
       setShowFeedback(true);
       setIsPlaying(false);
