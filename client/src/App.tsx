@@ -5,10 +5,19 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
+import { useLocation } from "wouter";
 
 function Router() {
+  const [location] = useLocation();
+  
+  // Handle GitHub Pages routing
+  const basePath = process.env.NODE_ENV === 'production' ? '/vocabulary-game' : '';
+  const normalizedPath = location.startsWith(basePath) 
+    ? location.slice(basePath.length) || '/'
+    : location;
+  
   return (
-    <Switch>
+    <Switch location={normalizedPath}>
       <Route path={"/"} component={Home} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
