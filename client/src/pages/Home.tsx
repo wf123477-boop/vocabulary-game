@@ -27,7 +27,8 @@ export default function Home() {
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
-    fetch("/vocabulary-images.json")
+    const basePath = process.env.NODE_ENV === 'production' ? '/vocabulary-game' : '';
+    fetch(`${basePath}/vocabulary-images.json`)
       .then((res) => res.json())
       .then((data) => {
         setVocabulary(data);
@@ -329,7 +330,7 @@ export default function Home() {
               <div className="space-y-6">
                 <div className="flex justify-center">
                   <img 
-                    src={current.image} 
+                    src={process.env.NODE_ENV === 'production' ? `/vocabulary-game${current.image}` : current.image} 
                     alt="vocabulary" 
                     className="max-w-sm max-h-64 object-contain rounded-lg"
                   />
