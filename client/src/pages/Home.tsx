@@ -27,7 +27,9 @@ export default function Home() {
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
-    const basePath = process.env.NODE_ENV === 'production' ? '/vocabulary-game' : '';
+    // Determine the correct base path
+    const currentPath = window.location.pathname;
+    const basePath = currentPath.includes('/vocabulary-game') ? '/vocabulary-game' : '';
     fetch(`${basePath}/vocabulary-images.json`)
       .then((res) => res.json())
       .then((data) => {
@@ -330,7 +332,11 @@ export default function Home() {
               <div className="space-y-6">
                 <div className="flex justify-center">
                   <img 
-                    src={process.env.NODE_ENV === 'production' ? `/vocabulary-game${current.image}` : current.image} 
+                    src={(() => {
+                      const currentPath = window.location.pathname;
+                      const basePath = currentPath.includes('/vocabulary-game') ? '/vocabulary-game' : '';
+                      return `${basePath}${current.image}`;
+                    })()} 
                     alt="vocabulary" 
                     className="max-w-sm max-h-64 object-contain rounded-lg"
                   />
