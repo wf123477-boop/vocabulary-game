@@ -120,13 +120,22 @@ export default function Home() {
       
       utterance.onerror = (event) => {
         console.error('Speech synthesis error:', event.error);
-        setFeedback(`音頻播放失敗: ${event.error}`);
+        setFeedback(`音頻播放失敗: ${event.error}。請確保您的瀏覽器支援語音合成。`);
         setShowFeedback(true);
         setIsPlaying(false);
       };
       
       // Speak
-      window.speechSynthesis.speak(utterance);
+      const result = window.speechSynthesis.speak(utterance);
+      console.log('Speech synthesis initiated:', result);
+      
+      // Set a timeout to reset playing state if nothing happens
+      setTimeout(() => {
+        if (isPlaying) {
+          console.log('Audio playback timeout');
+          setIsPlaying(false);
+        }
+      }, 5000);
       
     } catch (error) {
       console.error('Error in playAudio:', error);
