@@ -27,19 +27,38 @@ export default function Home() {
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
-    // Determine the correct base path
-    const currentPath = window.location.pathname;
-    const basePath = currentPath.includes('/vocabulary-game') ? '/vocabulary-game' : '';
-    fetch(`${basePath}/vocabulary-images.json`)
-      .then((res) => res.json())
-      .then((data) => {
+    const loadVocabulary = async () => {
+      try {
+        // Determine the correct base path
+        const currentPath = window.location.pathname;
+        const basePath = currentPath.includes('/vocabulary-game') ? '/vocabulary-game' : '';
+        const url = `${basePath}/vocabulary-images.json`;
+        
+        console.log('Current pathname:', currentPath);
+        console.log('Base path:', basePath);
+        console.log('Fetching from:', url);
+        
+        const res = await fetch(url);
+        console.log('Response status:', res.status);
+        
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        
+        const data = await res.json();
+        console.log('Vocabulary loaded successfully:', data.length, 'items');
         setVocabulary(data);
         setLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("Failed to load vocabulary:", err);
+        if (err instanceof Error) {
+          console.error("Error message:", err.message);
+        }
         setLoading(false);
-      });
+      }
+    };
+    
+    loadVocabulary();
   }, []);
 
   const resetGame = () => {
@@ -246,6 +265,8 @@ export default function Home() {
   }
 
   const current = vocabulary[currentIndex];
+  const currentPath = window.location.pathname;
+  const basePath = currentPath.includes('/vocabulary-game') ? '/vocabulary-game' : '';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
@@ -332,11 +353,7 @@ export default function Home() {
               <div className="space-y-6">
                 <div className="flex justify-center">
                   <img 
-                    src={(() => {
-                      const currentPath = window.location.pathname;
-                      const basePath = currentPath.includes('/vocabulary-game') ? '/vocabulary-game' : '';
-                      return `${basePath}${current.image}`;
-                    })()} 
+                    src={`${basePath}${current.image}`}
                     alt="vocabulary" 
                     className="max-w-sm max-h-64 object-contain rounded-lg"
                   />
